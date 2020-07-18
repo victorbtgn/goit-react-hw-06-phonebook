@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import phonebookAction from '../../redux/phonebook-action';
 import PropTypes from 'prop-types';
 
 const Filter = ({ filter, contactsLength, onChange }) => (
@@ -12,7 +14,6 @@ const Filter = ({ filter, contactsLength, onChange }) => (
           name="filter"
           value={filter}
           className="input"
-          // placeholder="Phone number"
           onChange={onChange}
         />
       </label>
@@ -26,4 +27,13 @@ Filter.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-export default Filter;
+const mapStateToProps = ({ contacts }) => ({
+  filter: contacts.filter,
+  contactsLength: contacts.items.length,
+});
+
+const mapDispatchToProps = dispatch => ({
+  onChange: e => dispatch(phonebookAction.changeFilter(e.target.value)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Filter);

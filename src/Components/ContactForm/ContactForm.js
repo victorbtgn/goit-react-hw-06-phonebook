@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import toaster from 'toasted-notes';
 import 'toasted-notes/src/styles.css';
+import phonebookAction from '../../redux/phonebook-action';
 
 class ContactForm extends Component {
   state = {
@@ -14,8 +16,25 @@ class ContactForm extends Component {
 
   createContact = evt => {
     evt.preventDefault();
+    const { name, number } = this.state;
 
-    if (this.state.number.length < 7 || this.state.number.length > 7) {
+    const isExist = this.props.items.find(item => item.name === name);
+
+    if (isExist) {
+      toaster.notify(`${name} is already in contacts.`, {
+        duration: 5000,
+      });
+      return;
+    }
+
+    if (!name || !number) {
+      toaster.notify('Please fill the form', {
+        duration: 5000,
+      });
+      return;
+    }
+
+    if (number.length < 7 || number.length > 7) {
       toaster.notify('Please fill the correct number: 12-34-567', {
         duration: 5000,
       });
@@ -68,4 +87,13 @@ class ContactForm extends Component {
   }
 }
 
-export default ContactForm;
+const mapStateToProps = ({ contacts }) => ({
+  items: contacts.items,
+});
+
+const mapDispatchToProps = dispatch => ({
+  onSubmit: contact =>
+    dispatch(phonebookAction.addContact(contact.name, contact.number)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactForm);

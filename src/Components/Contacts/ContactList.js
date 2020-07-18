@@ -1,5 +1,7 @@
 import React from 'react';
 import ContactItem from './ContactItem';
+import { connect } from 'react-redux';
+import phonebookAction from '../../redux/phonebook-action';
 import PropTypes from 'prop-types';
 
 const ContactList = ({ contacts, onDelete }) => (
@@ -21,4 +23,21 @@ ContactList.propTypes = {
   onDelete: PropTypes.func.isRequired,
 };
 
-export default ContactList;
+const getVisibleContacts = (allContacts, filter) => {
+  const normalizeFilter = filter.toLowerCase();
+  // const sortContactsByName = allContacts
+
+  return allContacts.filter(contact =>
+    contact.name.toLowerCase().includes(normalizeFilter),
+  );
+};
+
+const mapStateToProps = ({ contacts }) => ({
+  contacts: getVisibleContacts(contacts.items, contacts.filter),
+});
+
+const mapDispatchToProps = dispatch => ({
+  onDelete: id => dispatch(phonebookAction.deleteContact(id)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
